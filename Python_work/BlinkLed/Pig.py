@@ -5,7 +5,7 @@ pi=pigpio.pi()
 pi.set_PWM_dutycycle(4,0)
 
 freq = 10
-dutycycle = .0 #Duty cycle ranges from 0 (always off) to 1 (always on)
+dutycycle = 0 #Duty cycle ranges from 0 (always off) to 1 (always on)
 
 pi.set_PWM_frequency(4, freq)
 pi.set_PWM_dutycycle(4, 255 * dutycycle)

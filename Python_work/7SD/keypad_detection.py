@@ -3,15 +3,15 @@ import time
 
 GPIO.setmode(GPIO.BCM)
 
-x1 = 1 #need to edit these values to the
-x2 = 2 #actual GPIO pins. These numbers are placeholders
-x3 = 3
-x4 = 4
+x1 = 2 #need to edit these values to the
+x2 = 3 #actual GPIO pins. These numbers are placeholders
+x3 = 4
+x4 = 14
 
-y1 = 5
-y2 = 6
-y3 = 7
-y4 = 8
+y1 = 15
+y2 = 18
+y3 = 27
+y4 = 17
 
 rows = [x1, x2, x3, x4]
 columns = [y1, y2, y3, y4]
@@ -45,6 +45,6 @@ running = True
 
 while running:
     for j in range(len(rows)):
-        if GPIO.output(rows[j]) == 1:
+        if GPIO.input(rows[j]) == 1:
             readkeypad(rows[j], [1,2,3,'A']) #I need to change the character array to include all character arrays, not just the first one
             break
