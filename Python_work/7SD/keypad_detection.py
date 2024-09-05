@@ -15,6 +15,12 @@ y4 = 17
 
 rows = [x1, x2, x3, x4]
 columns = [y1, y2, y3, y4]
+row1_chars = [1,2,3,'A']
+row2_chars = [4,5,6,'B']
+row3_chars = [7,8,9,'C']
+row4_chars = ['*', 0, '#', 'D']
+
+characters = [row1_chars, row2_chars, row3_chars, row4_chars]
 
 for j in range(len(rows)): #defining x rows as output
     GPIO.setup(rows[j], GPIO.OUT)
@@ -45,4 +51,5 @@ running = True
 
 while running:
     for j in range(len(rows)):
-        readkeypad(rows[j],[1,2,3,'A'])
+        for i in range(len(characters)):
+            readkeypad(rows[j],characters[i])
