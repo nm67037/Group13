@@ -1,7 +1,9 @@
 import RPi.GPIO as GPIO
 import time
+from time import sleep
 
 GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
 
 x1 = 2 
 x2 = 3 
@@ -35,6 +37,7 @@ def readkeypad(rownum,char): #this function needs to be told what row number it'
     for i in range(len(columns)): #using iteration, check each column for logic HIGH
         if GPIO.input(columns[i]) == 1:
             outval = char[i] #column n is associated with character n in char array from function input
+            sleep(0.5)
             break
 
     GPIO.output(rownum, GPIO.LOW) #resetting the row to go back to basic off state
@@ -50,6 +53,5 @@ def readkeypad(rownum,char): #this function needs to be told what row number it'
 running = True
 
 while running:
-    for j in range(len(rows)):
-        for i in range(len(characters)):
-            readkeypad(rows[j],characters[i])
+    for j in range(len(rows)) and range(len(characters)):
+            readkeypad(rows[j],characters[j])
