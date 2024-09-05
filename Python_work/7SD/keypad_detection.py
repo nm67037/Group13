@@ -40,4 +40,15 @@ def readkeypad(rownum,char): #this function needs to be told what row number it'
     
     return outval
 
-#now, we need t
+#now, we need to constantly poll the x outputs to see if any row was engaged. 
+#when the Pi detects an engaged row, we can call the readkeypad function
+#given the rownum argument and the character array inside that row.
+
+running = True
+rows = [x1, x2, x3, x4]
+while running:
+    for j in range(len(rows)):
+        if GPIO.output(rows[j]) == 1:
+            readkeypad(rows[j], [1,2,3,'A']) #I need to change the character array to include all character arrays, not just the first one
+            break
+        
