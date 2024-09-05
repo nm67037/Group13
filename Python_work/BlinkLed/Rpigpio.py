@@ -4,9 +4,9 @@ GPIO.setwarnings(0)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(4,GPIO.OUT,initial=GPIO.LOW)
 
-freq = 2000 #Frequency in herts
+freq = 1 #Frequency in herts
 per = 1/freq #period of the square wave
-dutycycle = .8 #number 0-1 .4 for 40% duty cycle high
+dutycycle = .5 #number 0-1 .4 for 40% duty cycle high
 h = per * dutycycle # Calculate the time spent high 
 l = per - h			# then set the remainder of the period for low
 
