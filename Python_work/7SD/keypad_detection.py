@@ -3,8 +3,8 @@ import time
 
 GPIO.setmode(GPIO.BCM)
 
-x1 = 2 #need to edit these values to the
-x2 = 3 #actual GPIO pins. These numbers are placeholders
+x1 = 2 
+x2 = 3 
 x3 = 4
 x4 = 14
 
@@ -45,4 +45,4 @@ running = True
 
 while running:
     for j in range(len(rows)):
-        
+        readkeypad(rows[j],[1,2,3,'A'])
