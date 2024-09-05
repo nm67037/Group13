@@ -45,6 +45,4 @@ running = True
 
 while running:
     for j in range(len(rows)):
-        if GPIO.input(rows[j]) == 1:
-            readkeypad(rows[j], [1,2,3,'A']) #I need to change the character array to include all character arrays, not just the first one
-            break
+        
