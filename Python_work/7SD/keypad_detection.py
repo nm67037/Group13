@@ -37,7 +37,7 @@ def readkeypad(rownum,char): #this function needs to be told what row number it'
     for i in range(len(columns)): #using iteration, check each column for logic HIGH
         if GPIO.input(columns[i]) == 1:
             outval = char[i] #column n is associated with character n in char array from function input
-            sleep(0.5)
+            sleep(0.35)
             break
 
     GPIO.output(rownum, GPIO.LOW) #resetting the row to go back to basic off state

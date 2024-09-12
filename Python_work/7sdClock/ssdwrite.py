@@ -31,14 +31,20 @@ N8 = [1, 1, 1, 1, 1, 1, 1]
 N9 = [1, 1, 1, 0, 0, 1, 1]
 N0 = [1, 1, 1, 1, 1, 1, 0]
 chars = [cA, cB, cC, cD, N1, N2, N3, N4, N5, N6, N7, N8, N9, N0]
-while True:
-    for i in  range(len(chars)):
-        for j in range(7):
-            GPIO.output(DFF_Pins[j + 2],chars[i][j])
-            GPIO.output(clk, GPIO.HIGH)
-            sleep(.001)
-            GPIO.output(clk, GPIO.LOW)
-        sleep(1)
+# while True:
+#     for i in  range(len(chars)):
+#         for j in range(7):
+#             GPIO.output(DFF_Pins[j + 2],chars[i][j])
+#             GPIO.output(clk, GPIO.HIGH)
+#             sleep(.001)
+#             GPIO.output(clk, GPIO.LOW)
+#         sleep(1)
+def printssd(input):
+    for i in range(7):
+        GPIO.output(DFF_Pins[i + 2],input[i])
+    GPIO.output(clk, GPIO.HIGH)
+    sleep(.001)
+    GPIO.output(clk, GPIO.LOW)
 
 
 
