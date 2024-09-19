@@ -5,22 +5,22 @@ from time import sleep
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-clk0 = 23
-clk1 = 0
-clk2 = 0
-clk3 = 0
+clk0 = 7
+clk1 = 5
+clk2 = 12
+clk3 = 16
+led = 6
 
-DP = 7  # DP
-C = 25 # C
-D = 10 # D
-E = 24 # E
-G = 22 # G
-F = 9  # F
-A = 11 # A
-B = 8  # B
+DP = 5  # D-flip-flop input: 4D, 4Q
+A = 25 # input: D6, output: Q6
+B = 8 # input: 5D, output: 5Q
+C = 9 # input: 3D, output: 3Q
+D = 23 # input: 2D, output: 2Q
+E = 22 # input: 1D, output: 1Q
+F = 10 # input: 7D, output: 7Q
+G = 24 # input: 8D, output: 8Q
 
-
-DFF_Pins = [clk0, clk1, clk2, clk3, DP, A, B, C, D, E, F, G]
+DFF_Pins = [clk0, clk1, clk2, clk3, led, DP, A, B, C, D, E, F, G]
 for j in range(len(DFF_Pins)): #defining gpios to dff as output
     GPIO.setup(DFF_Pins[j], GPIO.OUT,initial=GPIO.LOW)
 
@@ -31,8 +31,8 @@ x4 = 14
 
 y1 = 15
 y2 = 18
-y3 = 27
-y4 = 17
+y3 = 17
+y4 = 27
 
 cA = [1, 1, 1, 0, 1, 1, 1]
 cB = [0, 0, 1, 1, 1, 1, 1]
