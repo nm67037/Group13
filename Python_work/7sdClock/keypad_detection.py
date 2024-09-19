@@ -5,7 +5,11 @@ from time import sleep
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-clk = 23
+clk0 = 23
+clk1 = 0
+clk2 = 0
+clk3 = 0
+
 DP = 7  # DP
 C = 25 # C
 D = 10 # D
@@ -14,7 +18,9 @@ G = 22 # G
 F = 9  # F
 A = 11 # A
 B = 8  # B
-DFF_Pins = [clk, DP, A, B, C, D, E, F, G]
+
+
+DFF_Pins = [clk0, clk1, clk2, clk3, DP, A, B, C, D, E, F, G]
 for j in range(len(DFF_Pins)): #defining gpios to dff as output
     GPIO.setup(DFF_Pins[j], GPIO.OUT,initial=GPIO.LOW)
 
@@ -83,9 +89,11 @@ def readkeypad(rownum,char): #this function needs to be told what row number it'
             break
 
     GPIO.output(rownum, GPIO.LOW) #resetting the row to go back to basic off state
+    
     if outval is not None:
         print(f"Button pressed: {outval}")
         #printssd(outval)
+        '''
         if (outval == hsh):
             if (on == 1):
                 if dot == True:
@@ -96,22 +104,37 @@ def readkeypad(rownum,char): #this function needs to be told what row number it'
                 printssd(outval)
                 on = 0
             else:
-                if dot == False and predot == 1:
+                if predot == 1:
                     dodot()
                 printssd(prehsh)
                 on = 1
         elif outval == '*':
             dodot()
-            #dot = not(dot)
-            #print("printing dot")
-            #GPIO.output(DP, dot)
-            #GPIO.output(clk, GPIO.HIGH)
-            #sleep(.001)
-            #GPIO.output(clk, GPIO.LOW)
         else:
             prehsh = outval
             on = 1
             printssd(outval)
+        '''
+    if (on):
+        if (outval == hsh):
+            printssd(outval)
+            on = 0
+            if (dot):
+                dodot()
+                predot = 1
+            else:
+                predot = 0
+        elif (outval == '*'):
+            dodot()
+        else:
+            prehsh = outval
+            printssd(outval)
+    elif (outval == hsh):
+        on = 1
+        printssd(outval)
+        if (predot):
+            dodot()
+        
         
          
     return outval
@@ -122,12 +145,13 @@ def printssd(input):
     GPIO.output(clk, GPIO.HIGH)
     sleep(.001)
     GPIO.output(clk, GPIO.LOW)
+
 def dodot():
     global dot, on
     if dot:
-        on = 0
+        dot = 0
     else:
-        on = 1
+        dot = 1
     dot = not(dot)
     print("printing dot")
     GPIO.output(DP, dot)
