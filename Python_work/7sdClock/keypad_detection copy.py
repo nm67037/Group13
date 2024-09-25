@@ -5,18 +5,30 @@ from time import sleep
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-clk = 23
-DP = 7  # DP
-C = 25 # C
-D = 10 # D
-E = 24 # E
-G = 22 # G
-F = 9  # F
-A = 11 # A
-B = 8  # B
-DFF_Pins = [clk, DP, A, B, C, D, E, F, G]
-for j in range(len(DFF_Pins)): #defining gpios to dff as output
-    GPIO.setup(DFF_Pins[j], GPIO.OUT,initial=GPIO.LOW)
+led = 6
+clk0 = 5
+clk1 = 7
+clk2 = 16
+clk3 = 12
+DP = 11  # D-flip-flop input: 4D, 4Q
+A = 25 # input: D6, output: Q6
+B = 8 # input: 5D, output: 5Q
+C = 9 # input: 3D, output: 3Q
+D = 23 # input: 2D, output: 2Q
+E = 22 # input: 1D, output: 1Q
+F = 10 # input: 7D, output: 7Q
+G = 24 # input: 8D, output: 8Q
+
+SSD_Pins = [DP, A, B, C, D, E, F, G]
+clks = [clk0, clk1, clk2, clk3]
+OPP= SSD_Pins 
+OPP.append(clks)
+OPP.append(led)
+
+
+for j in range(len(OPP)): #defining gpios to dff as output
+    print(OPP[j])
+    GPIO.setup(OPP[j], GPIO.OUT,initial=GPIO.LOW)
 
 x1 = 2 
 x2 = 3 
@@ -25,8 +37,8 @@ x4 = 14
 
 y1 = 15
 y2 = 18
-y3 = 27
-y4 = 17
+y3 = 17
+y4 = 27
 
 cA = [1, 1, 1, 0, 1, 1, 1]
 cB = [0, 0, 1, 1, 1, 1, 1]
@@ -83,25 +95,27 @@ def readkeypad(rownum,char): #this function needs to be told what row number it'
             ssdon()
         else:
             ssdstate = True
-            printssd(outval)
+            printssd(outval,clks[1])
             lastval = outval
     return outval
 
-def printssd(input):
+def printssd(input,clock):
     for i in range(7):
-        GPIO.output(DFF_Pins[i + 2],input[i])
-    GPIO.output(clk, GPIO.HIGH)
+        GPIO.output(SSD_Pins[i],input[i])
+    GPIO.output(clock, GPIO.HIGH)
     sleep(.001)
-    GPIO.output(clk, GPIO.LOW)
+    GPIO.output(clock, GPIO.LOW)
 
 def ssdon():
     global lastval,ssdstate
     if ssdstate == True:
         ssdstate = False
-        printssd(hsh)
+        for i in range(4):
+            printssd(hsh,clks[i])
     else:
         ssdstate = True
-        printssd(lastval)
+        for i in range(4):
+            printssd(lastval,clks[i])
 
 #now, we need to constantly poll the x outputs to see if any row was engaged. 
 #when the Pi detects an engaged row, we can call the readkeypad function
@@ -110,5 +124,7 @@ def ssdon():
 running = True
 
 while running:
+    for i in range(4):
+        printssd(hsh,clks[i])
     for j in range(len(rows)) and range(len(characters)):
             readkeypad(rows[j],characters[j])

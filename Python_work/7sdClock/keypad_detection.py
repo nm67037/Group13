@@ -5,13 +5,19 @@ from time import sleep
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-clk0 = 7
-clk1 = 5
-clk2 = 12
-clk3 = 16
+clk0 = 5
+clk1 = 7
+clk2 = 16
+clk3 = 12
+
+global clkIndex
+clkIndex = 0
+global currentClk
+currentClk = 0
+
 led = 6
 
-DP = 5  # D-flip-flop input: 4D, 4Q
+DP = 11  # D-flip-flop input: 4D, 4Q
 A = 25 # input: D6, output: Q6
 B = 8 # input: 5D, output: 5Q
 C = 9 # input: 3D, output: 3Q
@@ -20,9 +26,17 @@ E = 22 # input: 1D, output: 1Q
 F = 10 # input: 7D, output: 7Q
 G = 24 # input: 8D, output: 8Q
 
-DFF_Pins = [clk0, clk1, clk2, clk3, led, DP, A, B, C, D, E, F, G]
-for j in range(len(DFF_Pins)): #defining gpios to dff as output
-    GPIO.setup(DFF_Pins[j], GPIO.OUT,initial=GPIO.LOW)
+SSD_Pins = [A, B, C, D, E, F, G]
+clkset = [clk0, clk1, clk2, clk3]
+OPP= SSD_Pins 
+OPP.append(clkset)
+OPP.append(led)
+OPP.append(DP)
+
+
+for j in range(len(OPP)): #defining gpios to dff as output
+    print(OPP[j])
+    GPIO.setup(OPP[j], GPIO.OUT,initial=GPIO.LOW)
 
 x1 = 2 
 x2 = 3 
@@ -52,7 +66,7 @@ hsh = [0, 0, 0, 0, 0, 0, 0]
 global on
 on = 1
 global prehsh
-prehsh = 0
+prehsh = [hsh,hsh,hsh,hsh]
 global predot
 predot = 0
 global dot
@@ -91,79 +105,99 @@ def readkeypad(rownum,char): #this function needs to be told what row number it'
     GPIO.output(rownum, GPIO.LOW) #resetting the row to go back to basic off state
     
     if outval is not None:
+        
         print(f"Button pressed: {outval}")
         #printssd(outval)
-        '''
-        if (outval == hsh):
-            if (on == 1):
-                if dot == True:
+
+        if (on):
+            if (outval == hsh):
+                for i in range(4):  
+                    printssd(outval,currentClk)
+                    nextClk()
+                on = 0
+                GPIO.output(led,0)
+                if (dot):
                     dodot()
                     predot = 1
                 else:
                     predot = 0
-                printssd(outval)
-                on = 0
-            else:
-                if predot == 1:
-                    dodot()
-                printssd(prehsh)
-                on = 1
-        elif outval == '*':
-            dodot()
-        else:
-            prehsh = outval
-            on = 1
-            printssd(outval)
-        '''
-    if (on):
-        if (outval == hsh):
-            printssd(outval)
-            on = 0
-            if (dot):
+            elif (outval == '*'):
                 dodot()
-                predot = 1
+                GPIO.output(led,0)
+            elif (outval == cA or outval == cB or outval == cC or outval == cD):
+                GPIO.output(led,1)
             else:
-                predot = 0
-        elif (outval == '*'):
-            dodot()
-        else:
-            prehsh = outval
-            printssd(outval)
-    elif (outval == hsh):
-        on = 1
-        printssd(outval)
-        if (predot):
-            dodot()
-        
+                prehsh[currentClk] = outval
+                if currentClk == 3 and dot:
+                    GPIO.output(DP, 1)
+                printssd(outval,currentClk)
+                GPIO.output(DP,0)
+                nextClk()
+                GPIO.output(led,0)
+        elif (outval == hsh):
+            on = 1
+            for i in range(4):
+                printssd(prehsh[i],i)
+            if (predot):
+                dodot()
         
          
     return outval
 
-def printssd(input):
+def printssd(input,clock):
+    global currentClk
+    if clock == None:
+        clock = currentClk
     for i in range(7):
-        GPIO.output(DFF_Pins[i + 2],input[i])
-    GPIO.output(clk, GPIO.HIGH)
+        GPIO.output(SSD_Pins[i],input[i])
+    GPIO.output(clkset[clock], GPIO.HIGH)
     sleep(.001)
-    GPIO.output(clk, GPIO.LOW)
+    GPIO.output(clkset[clock], GPIO.LOW)
+    
+    '''
+    
+    GPIO.output(clkset[currentClk], GPIO.HIGH)
+    sleep(.001)
+    GPIO.output(clkset[currentClk], GPIO.LOW)
+    '''
+#def onoff():
+# def invInput():
+#     if on:
+
 
 def dodot():
-    global dot, on
-    if dot:
-        dot = 0
-    else:
-        dot = 1
+    global dot, on, currentClk
+    print("dot = ", dot)
     dot = not(dot)
     print("printing dot")
+    print("dot = ", dot)
     GPIO.output(DP, dot)
-    GPIO.output(clk, GPIO.HIGH)
+    if on:
+        printssd(prehsh[3],3)
+    GPIO.output(clkset[3], GPIO.HIGH)
     sleep(.001)
-    GPIO.output(clk, GPIO.LOW)
+    GPIO.output(clkset[3], GPIO.LOW)
+    GPIO.output(DP,0)
 #now, we need to constantly poll the x outputs to see if any row was engaged. 
 #when the Pi detects an engaged row, we can call the readkeypad function
 #given the rownum argument and the character array inside that row.
+    
+def nextClk():
+    global clkset, currentClk, clkIndex
+    if (clkIndex < 3):
+        clkIndex += 1
+    else:
+        clkIndex = 0
+    currentClk = clkIndex
+    
+    print("currentClk = ", currentClk)
+    
 
 running = True
-
+for i in range(4):
+    printssd(hsh,currentClk)
+    nextClk()
 while running:
+
     for j in range(len(rows)) and range(len(characters)):
             readkeypad(rows[j],characters[j])
