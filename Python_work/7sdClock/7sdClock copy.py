@@ -88,7 +88,7 @@ def readkeypad(): #When called this iterates through each key on the keypad unti
     global now, ssdstate, b_press_count, diff, flashd, mset, timer
     outval = None #Initializing the output of the method
     while outval == None:
-        # start = datetime.now()
+        start = datetime.now()
         for j in range(len(rows)) and range(len(characters)): #set a high state on each row of the keypad at a time
             GPIO.output(rows[j], GPIO.HIGH) 
             #in each iteration,the columns are checked against the row that is high
@@ -131,10 +131,10 @@ def readkeypad(): #When called this iterates through each key on the keypad unti
         timer += 3.03*10**-5
         if timer > 60:
             timer = 0
-        # end = datetime.now()
-        # starttime = start.minute * 60 + start.second + start.microsecond*pow(10,-6)
-        # endtime = end.minute * 60 + end.second + end.microsecond*pow(10,-6)
-        # print(endtime - starttime)
+        end = datetime.now()
+        starttime = start.minute * 60 + start.second + start.microsecond*pow(10,-6)
+        endtime = end.minute * 60 + end.second + end.microsecond*pow(10,-6)
+        print(endtime - starttime)
 
 
     return outval
