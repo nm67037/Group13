@@ -71,7 +71,7 @@ row3_chars = [N7,N8,N9,cC]
 row4_chars = [dt, N0, hsh, cD]
 characters = [row1_chars, row2_chars, row3_chars, row4_chars]
 #list of global variables that will need to be referenced by the methods that need them and initializing them
-global cmode,ssdstate,now,display,flstime,dstate,diff,flashd,mminute,mhour,mset,b_press_count,
+global cmode,ssdstate,now,display,flstime,dstate,diff,flashd,mminute,mhour,mset,b_press_count
 cmode = 0 #keep track of which mode the clock is in, [start] = 0, [auto] = 1, and [manual] = 2
 ssdstate = 1 #keeps track of whether or not the clock displays are on or not
 flstime = datetime.now() #used to determine the elapsed time since change the state of a flashing display
