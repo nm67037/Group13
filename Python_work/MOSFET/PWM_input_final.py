@@ -1,72 +1,100 @@
-import pigpio
-from pigpio_encoder import Rotary 
+import RPi.GPIO as GPIO
 import time
 import sys
 
-#initializing pi
-pi = pigpio.pi()
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
 
-#setting up counter for rotations
-global seconds, cw_step, cc_step, turns
-seconds = 0
-cw_step = 0
-cc_step = 0
+clk = 6
+dt = 5
+sw = 16
+
+GPIO.setup(clk,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(dt,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(sw,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+
+lastClkState = GPIO.input(clk)
+lastDtState = GPIO.input(dt)
+
+debouncedClk = 1
+debouncedDt = 0
+steps = 0
+turns = 0
+delay = .001
 turns = 0
 
-#clockwise function 
-def clockwise():
-    global turns, cw_step, cc_step
-    
-    cw_step += 1
-    print("Clockwise")
-    
-    if (cw_step == 20):
-        turns += 1
-        cw_step = 0
-
-    if (cc_step > 1):
-        cc_step -= 1
-   
-    #print("steps: ", cw_step)
-    #print("turns: ", turns)
-
-#counter-clockwise function
-def cclockwise():
-    global turns, cc_step, cw_step
-    cc_step += 1
-
-    if (cc_step == 20): #20 steps in 1 full rotation
-         turns += 1
-         cc_step = 0
-
-    if (cw_step > 1):
-        cw_step -= 1
+startTime = time.perf_counter()
+endTime = 0
+elapsedTime = 0
+totalTurns = 0
 
 
-    print("Counter clockwise")
-    #print("steps: ", cc_step)
-    #print("turns: ", turns)
-
-#button press function
-def press():
-    print("Press")
-
-#initializing encoder clk, dt, and sw pins
-encoder = Rotary(clk_gpio=6, dt_gpio=5, sw_gpio=16)
-
-#setting up callback functions
-encoder.setup_rotary(up_callback=cclockwise,
-    down_callback=clockwise
-)
-
-#initializing callback function when encoder is pressed
-encoder.setup_switch(sw_short_callback=press)
-
-#infinite while loop to track encoder state
 while True:
-	time.sleep(1)
-	seconds += 1
-	tps = float(turns)/seconds
-	#prints when encoder not in use
-	print("None")
-	print("turns/second: ", tps)
+    
+    clkState = GPIO.input(clk)
+    dtState = GPIO.input(dt)
+    swState = GPIO.input(sw)
+    
+    if (swState == GPIO.LOW):
+        print("Press")
+        time.sleep(.5)
+    
+    if clkState != lastClkState:
+        time.sleep(delay)
+        clkState = GPIO.input(clk)
+        if clkState != lastClkState:
+            debouncedClk = clkState            
+            
+    if dtState != lastDtState:
+        time.sleep(delay)
+        dtState = GPIO.input(dt)
+        if dtState != lastDtState:
+            debouncedDt = dtState
+    
+    if debouncedClk != lastClkState:
+        if debouncedDt != debouncedClk:
+            steps += .5
+            if ((steps % 1) == 0):
+                print("Clockwise")
+        else:
+            steps -= .5
+            if ((steps % 1) == 0):
+                print("Counter-clockwise")
+        if ((steps % 1) == 0):
+            print(round(steps))
+            totalTurns += 1
+        time.sleep(delay)
+        
+        if (steps == 20):
+            turns += 1
+#     else:
+        #print("None")
+        
+    endTime = time.perf_counter()
+    elapsedTime = endTime - startTime
+    if ((elapsedTime) > 1):
+        print("Turns/sec = ", totalTurns)
+        totalTurns = 0
+        startTime = time.perf_counter()
+    
+    lastClkState = debouncedClk
+    lastDtState = debouncedDt
+    #print("None")
+    #tps = float(turns) / seconds
+    #print("turns/sec", tps)
+    
+    '''
+    if clkState!=lastdtState:
+        time.sleep(.005)
+        clkState = GPIO.input(clk)
+        if dtState!=clkState:
+            time.sleep(.01)
+            print("Clockwise")
+            steps+=1
+        else:
+            time.sleep(.01)
+            print("Counter-clockwise")
+            steps-=1
+    lastClkState=clkState
+    '''
+    
