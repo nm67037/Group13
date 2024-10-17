@@ -71,7 +71,7 @@ row3_chars = [N7,N8,N9,cC]
 row4_chars = [dt, N0, hsh, cD]
 characters = [row1_chars, row2_chars, row3_chars, row4_chars]
 #list of global variables that will need to be referenced by the methods that need them and initializing them
-global cmode,ssdstate,now,display,flstime,dstate,diff,flashd,mminute,mhour,mset,b_press_count,timer
+global cmode,ssdstate,now,display,flstime,dstate,diff,flashd,mminute,mhour,mset,b_press_count
 cmode = 0 #keep track of which mode the clock is in, [start] = 0, [auto] = 1, and [manual] = 2
 ssdstate = 1 #keeps track of whether or not the clock displays are on or not
 flstime = datetime.now() #used to determine the elapsed time since change the state of a flashing display
@@ -82,7 +82,6 @@ mminute = 0 #used by manual mode to keep track of the minutes it has
 mhour = 0 #used by manual mode to keep track of the hours it has
 mset = 0 #used by manual mode to keep track of whether or not it has been set or not
 b_press_count = 0 #creating a global counting variable to keep track of how many times b is pressed. Initializing it at 0.
-timer = 0
 
 def readkeypad(): #When called this iterates through each key on the keypad until a key is pressed
     global now, ssdstate, b_press_count, diff, flashd, mset, timer
@@ -96,7 +95,6 @@ def readkeypad(): #When called this iterates through each key on the keypad unti
                 if GPIO.input(columns[i]) == 1: 
                     outval = characters[j][i] #When a high state is detected the outval is set by which row and column are are being checked
                     delay(0.35) #Delay for debounce on input
-                    timer += 0.35
                     break
 
             GPIO.output(rows[j], GPIO.LOW) #resetting the row to go back to basic off state
@@ -125,16 +123,10 @@ def readkeypad(): #When called this iterates through each key on the keypad unti
         elif cmode == 2:#Manual mode is checked to be updated
             if flashd < 4:#if flash has a valid display number it will be used
                 flash(flashd)
-            if mset == 1 and timer > 60:#check to see if Manual mode needs to be updated
-                # now = datetime.now()
+            if mset == 1 and (datetime.now().minute - now.minute) != 0:#check to see if Manual mode needs to be updated
+                now = datetime.now()
                 manmode(True)#True makes the manual clock update its values
-        timer += 3.03*10**-5
-        if timer > 60:
-            timer = 0
-        # end = datetime.now()
-        # starttime = start.minute * 60 + start.second + start.microsecond*pow(10,-6)
-        # endtime = end.minute * 60 + end.second + end.microsecond*pow(10,-6)
-        # print(endtime - starttime)
+
 
 
     return outval
