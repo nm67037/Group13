@@ -1,3 +1,4 @@
+#import RPi.GPIO
 
 
 # Morse code dictionary for English letters and numbers
@@ -33,4 +34,4 @@ for line in lines:
     word = line.strip()  # Strip any extra spaces or newline characters
     if word:  # Only process if the line contains a word
         morse_code = text_to_morse(word)
-        print(morse_code)
+        print(f"{morse_code}{word}")
