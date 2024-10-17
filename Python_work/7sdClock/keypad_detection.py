@@ -173,10 +173,10 @@ def dodot():
     print("dot = ", dot)
     GPIO.output(DP, dot)
     if on:
-        printssd(prehsh[3],3)
-    GPIO.output(clkset[3], GPIO.HIGH)
+        printssd(prehsh[1],1)
+    GPIO.output(clkset[1], GPIO.HIGH)
     sleep(.001)
-    GPIO.output(clkset[3], GPIO.LOW)
+    GPIO.output(clkset[1], GPIO.LOW)
     GPIO.output(DP,0)
 #now, we need to constantly poll the x outputs to see if any row was engaged. 
 #when the Pi detects an engaged row, we can call the readkeypad function
