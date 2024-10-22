@@ -1,4 +1,5 @@
 #import RPi.GPIO
+#from time import sleep
 
 
 # Morse code dictionary for English letters and numbers
@@ -24,8 +25,8 @@ def text_to_morse(text):
             morse_code.append('?')  # Unknown characters are marked as '?'
     return ' '.join(morse_code) + ' |'  # Add '|' at the end of each Morse word
 
-# Read words from the text file (multiple lines)
-file_path = '/home/vizhins/Embedded_1/Group13/Python_work/MC_ENCODER/english.txt'  # Replace with the actual file path
+# Read words from the text file (multiple lines) 
+file_path = '/home/vizhins/Embedded_1/Group13/Python_work/MC_ENCODER/mcencode.txt'  # Replace with the actual file path
 with open(file_path, 'r') as file:
     lines = file.readlines()  # Read all lines from the file
 
@@ -35,3 +36,9 @@ for line in lines:
     if word:  # Only process if the line contains a word
         morse_code = text_to_morse(word)
         print(f"{morse_code}{word}")
+
+def input_dot_time():
+    dot = input("Dot length:") #need to restrict input range to 0.001 to 2 seconds
+    return dot
+
+dot_length = input_dot_time()
