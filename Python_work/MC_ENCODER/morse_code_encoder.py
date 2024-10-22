@@ -1,4 +1,4 @@
-#import RPi.GPIO
+import pigpio
 #from time import sleep
 
 
