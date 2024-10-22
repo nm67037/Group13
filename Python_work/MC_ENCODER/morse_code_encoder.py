@@ -1,7 +1,3 @@
-import pigpio
-#from time import sleep
-
-
 # Morse code dictionary for English letters and numbers
 morse_code_dict = {
     'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.',
@@ -16,19 +12,22 @@ morse_code_dict = {
 # Function to convert text to Morse code
 def text_to_morse(text):
     morse_code = []
-    for char in text.upper():  # Convert to uppercase to match the dictionary
+    for char in text.upper():
         if char in morse_code_dict:
-            morse_code.append(morse_code_dict[char])
+            # Join dots and dashes with a single space
+            morse_code.append(' '.join(morse_code_dict[char]))
         elif char == ' ':
-            morse_code.append('/')  # Use '/' to denote a space between words
+            # Use '/' to denote a space between words
+            morse_code.append('/')
         else:
             morse_code.append('?')  # Unknown characters are marked as '?'
-    return ' '.join(morse_code) + ' |'  # Add '|' at the end of each Morse word
+    # Join letters with three spaces
+    return '   '.join(morse_code) + ' |'
 
-# Read words from the text file (multiple lines) 
+# Read words from the text file (multiple lines)
 file_path = '/home/vizhins/Embedded_1/Group13/Python_work/MC_ENCODER/mcencode.txt'  # Replace with the actual file path
 with open(file_path, 'r') as file:
-    lines = file.readlines()  # Read all lines from the file
+    lines = file.readlines()
 
 # Process each word (each line) and convert to Morse code
 for line in lines:
@@ -38,7 +37,15 @@ for line in lines:
         print(f"{morse_code}{word}")
 
 def input_dot_time():
-    dot = input("Dot length:") #need to restrict input range to 0.001 to 2 seconds
-    return dot
+    while True:
+        try:
+            dot = float(input("Dot length (in seconds, between 0.001 and 2): "))
+            if 0.001 <= dot <= 2:
+                return dot
+            else:
+                print("Please enter a value between 0.001 and 2.")
+        except ValueError:
+            print("Invalid input. Please enter a numeric value.")
 
 dot_length = input_dot_time()
+

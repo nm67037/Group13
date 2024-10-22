@@ -26,12 +26,15 @@ def text_to_morse(text):
     morse_code = []
     for char in text.upper():
         if char in morse_code_dict:
-            morse_code.append(morse_code_dict[char])
+            # Join dots and dashes with a single space
+            morse_code.append(' '.join(morse_code_dict[char]))
         elif char == ' ':
-            morse_code.append('/')  # Use '/' to denote a space between words
+            # Use '/' to denote a space between words
+            morse_code.append('/')
         else:
             morse_code.append('?')  # Unknown characters are marked as '?'
-    return morse_code
+    # Join letters with three spaces
+    return '   '.join(morse_code) + ' |'
 
 # Function to play a dot (high for x seconds)
 def play_dot(dot_length):
@@ -75,6 +78,7 @@ def input_dot_time():
         except ValueError:
             print("Invalid input. Please enter a numeric value.")
 
+
 dot_length = input_dot_time()
 
 # Process each word and convert to Morse code
@@ -84,6 +88,12 @@ for line in lines:
         morse_code_sequence = text_to_morse(word)
         print(f"Morse Code for {word}: {' '.join(morse_code_sequence)}")
         play_morse_code(morse_code_sequence, dot_length)
+
+for line in lines:
+    word = line.strip()  # Strip any extra spaces or newline characters
+    if word:  # Only process if the line contains a word
+        morse_code = text_to_morse(word)
+        print(f"{morse_code}{word}")
 
 # Cleanup when done
 pi.stop()
