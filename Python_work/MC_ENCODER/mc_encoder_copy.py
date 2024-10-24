@@ -5,7 +5,7 @@ from time import sleep
 pi = pigpio.pi()  # Connect to pigpio daemon
 if not pi.connected:
     exit()
-pi.set_PWM_frequency(17,500)
+pi.set_PWM_frequency(17,800)
 # Setup the GPIO pin (adjust the pin number based on your circuit)
 LED_PIN = 17  # Example GPIO pin connected to the speaker/microphone
 
@@ -25,7 +25,7 @@ morse_code_dict = {
 # Function to convert text to Morse code
 def t2m(text):
     morse_code = []
-  
+#    print(text)
     for char in text.upper():
         if char in morse_code_dict:
             # Join dots and dashes with a single space
@@ -37,7 +37,8 @@ def t2m(text):
             #morse_code.append('?')  # Unknown characters are marked as '?'
             pass
         # Join letters with three spaces
-        return '   '.join(morse_code) + ' |'
+#    print(morse_code)
+    return '   '.join(morse_code) + ' |'
 
 
 def encode(text):
@@ -48,7 +49,7 @@ def encode(text):
     return ' '.join(mcode)
 # Function to play a dot (high for x seconds)
 def play_dot(dot_length):
-    #print("play dot")
+    print("play dot")
     pi.set_PWM_dutycycle(17,127)  # Set GPIO high
     sleep(dot_length)
     pi.set_PWM_dutycycle(17,0)  # Set GPIO low
@@ -56,7 +57,7 @@ def play_dot(dot_length):
 
 # Function to play a dash (high for 3x seconds)
 def play_dash(dot_length):
-    #print("play dash")
+    print("play dash")
     pi.set_PWM_dutycycle(17,127)  # Set GPIO high
     sleep(3 * dot_length)
     pi.set_PWM_dutycycle(17,0)  # Set GPIO low
@@ -65,17 +66,17 @@ def play_dash(dot_length):
 # Function to play a Morse code sequence
 def play_morse_code(morse_code_sequence, dot_length):
     for symbol in morse_code_sequence:
-        #print(symbol)
+        print(symbol)
         if symbol == '.':
             play_dot(dot_length)
         elif symbol == '-':
             play_dash(dot_length)
         elif symbol == '/':  # Space between words
-            #print("word end")
+            print("word end")
             sleep(7 * dot_length)
         else:
-            #print("char end")
-            sleep(3 * dot_length)  # Space between letters
+            print("dit end")
+            sleep(dot_length)  # Space between letters
 
 # Read words from the text file (multiple lines) 
 file_path = '/home/group13/Desktop/4230_Embedded_Group13/Group13/Python_work/MC_ENCODER/mcencode.txt'  # Replace with actual file path
@@ -85,9 +86,9 @@ with open(file_path, 'r') as file:
     i = 1
     #print(len(lines))
     for j in range(len(lines)):
-        lines.insert(i,"*")
+        lines.insert(i,"*\n")
         i += 2
-    lines.insert(0,"#")
+    lines.insert(0,"#\n")
     print(lines)
 
 
@@ -108,18 +109,19 @@ dot_length = input_dot_time()
 
 # Process each word and convert to Morse code
 # Process each word and convert to Morse code
-if dot_length > 0.05:
+if dot_length > 0.005:
     for line in lines:
         word = line.strip()
         if word:
+            #print(word)
             if word == '#':
-                morse_code_sequence = t2m('attention')
-                print(f"Morse Code for attention: {' '.join(morse_code_sequence)}")
-                play_morse_code(morse_code_sequence, dot_length)
+#                morse_code_sequence = t2m('attention')
+#                print(f"Morse Code for attention: {' '.join(morse_code_sequence)}")
+                play_morse_code(' - . - . - ', dot_length)
             elif word == '*':
-                morse_code_sequence = t2m('out')
-                print(f"Morse Code for out: {' '.join(morse_code_sequence)}")
-                play_morse_code(morse_code_sequence, dot_length)
+#                morse_code_sequence = t2m('out')
+#                print(f"Morse Code for out: {' '.join(morse_code_sequence)}")
+                play_morse_code(' . - . - . ', dot_length)
             else:
                 morse_code_sequence = t2m(word)
                 print(f"Morse Code for {word}: {' '.join(morse_code_sequence)}")
@@ -132,14 +134,16 @@ with open(output_file_path, 'w') as output:
         for words in word:
             if words == '#':
                 mcode = encode('attention')
-                output.write(f"{mcode} | attention\n")
+                output.write(f"-.-.- | attention\n")
+                print(f"-.-.- | attention")
             elif words == '*':
                 mcode = encode('out')
-                output.write(f"{mcode} | out\n")
+                output.write(f".-.-. | out\n")
+                print(f".-.-. | out")
             else:
                 mcode = encode(words)
                 output.write(f"{mcode} | {words}\n")
-            print(f"{mcode} | {words}")
+                print(f"{mcode} | {words}")
 
 
 # Cleanup when done
