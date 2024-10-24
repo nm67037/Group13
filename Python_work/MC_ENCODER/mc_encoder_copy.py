@@ -107,27 +107,38 @@ def input_dot_time():
 dot_length = input_dot_time()
 
 # Process each word and convert to Morse code
+# Process each word and convert to Morse code
 if dot_length > 0.05:
     for line in lines:
         word = line.strip()
         if word:
-            morse_code_sequence = t2m(word)
-            print(f"Morse Code for {word}: {' '.join(morse_code_sequence)}")
-            play_morse_code(morse_code_sequence, dot_length)
+            if word == '#':
+                morse_code_sequence = t2m('attention')
+                print(f"Morse Code for attention: {' '.join(morse_code_sequence)}")
+                play_morse_code(morse_code_sequence, dot_length)
+            elif word == '*':
+                morse_code_sequence = t2m('out')
+                print(f"Morse Code for out: {' '.join(morse_code_sequence)}")
+                play_morse_code(morse_code_sequence, dot_length)
+            else:
+                morse_code_sequence = t2m(word)
+                print(f"Morse Code for {word}: {' '.join(morse_code_sequence)}")
+                play_morse_code(morse_code_sequence, dot_length)
+
 output_file_path = '/home/group13/Desktop/4230_Embedded_Group13/Group13/Python_work/MC_ENCODER/output.txt'
 with open(output_file_path, 'w') as output:
     for line in lines:
         word = line.strip().split()  # Strip any extra spaces or newline characters
-        #print(word)
         for words in word:
-            #print(words)
-            mcode = encode(words)
-            #print(mcode)
-            if (words == '#'):
+            if words == '#':
+                mcode = encode('attention')
                 output.write(f"{mcode} | attention\n")
-            elif (words == '*'):
+            elif words == '*':
+                mcode = encode('out')
                 output.write(f"{mcode} | out\n")
-            output.write(f"{mcode} | {words}\n")
+            else:
+                mcode = encode(words)
+                output.write(f"{mcode} | {words}\n")
             print(f"{mcode} | {words}")
 
 
