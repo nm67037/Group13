@@ -72,6 +72,7 @@ file_path = '/home/group13/Desktop/4230_Embedded_Group13/Group13/Python_work/MC_
 with open(file_path, 'r') as file:
     lines = file.readlines()
 
+
 # Ask user for dot length (restrict range between 0.001 and 2 seconds)
 def input_dot_time():
     while True:
@@ -96,11 +97,24 @@ if dot_length > 0.05:
             print(f"Morse Code for {word}: {' '.join(morse_code_sequence)}")
             play_morse_code(morse_code_sequence, dot_length)
 
-for line in lines:
-    word = line.strip()  # Strip any extra spaces or newline characters
-    if word:  # Only process if the line contains a word
-        morse_code = text_to_morse(word)
-        print(f"{morse_code}{word}")
+with open('/home/group13/Desktop/4230_Embedded_Group13/Group13/Python_work/MC_ENCODER/output.txt', 'w') as output:
+    for line in lines:
+        word = line.strip()  # Strip any extra spaces or newline characters
+        if word:  # Only process if the line contains a word
+            morse_code = text_to_morse(word)
+            if morse_code == '/':
+                output.write("\n")
+            else:
+                output.write(f"{morse_code}{word}\n")
+                print(f"{morse_code}{word}")
+
+    # Process each word (each line) and convert to Morse code
+#     for line in lines:
+#         word = line.strip()  # Strip any extra spaces or newline characters
+#         if word:  # Only process if the line contains a word
+#             morse_code = text_to_morse(word)
+#   # Write to file
+#             print(f"Converted: {morse_code}{word}")  # Also print to terminal
 
 # Cleanup when done
 pi.stop()
