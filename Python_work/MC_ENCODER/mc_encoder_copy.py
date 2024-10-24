@@ -22,7 +22,7 @@ morse_code_dict = {
 }
 
 # Function to convert text to Morse code
-def text_to_morse(text):
+def t2m(text):
     morse_code = []
     for char in text.upper():
         if char in morse_code_dict:
@@ -32,10 +32,16 @@ def text_to_morse(text):
             # Use '/' to denote a space between words
             morse_code.append('/')
         else:
-            morse_code.append('?')  # Unknown characters are marked as '?'
+            #morse_code.append('?')  # Unknown characters are marked as '?'
+            pass
     # Join letters with three spaces
     return '   '.join(morse_code) + ' |'
-
+def encode(text):
+    mcode = []
+    for char in text.upper():
+        mcode.append(morse_code_dict[char])
+    #print(mcode)
+    return ' '.join(mcode)
 # Function to play a dot (high for x seconds)
 def play_dot(dot_length):
     #print("play dot")
@@ -68,9 +74,17 @@ def play_morse_code(morse_code_sequence, dot_length):
             sleep(3 * dot_length)  # Space between letters
 
 # Read words from the text file (multiple lines) 
-file_path = '/home/group13/Desktop/4230_Embedded_Group13/Group13/Python_work/MC_ENCODER/mcencode.txt'  # Replace with actual file path
+file_path = '/home/jdieffy/Documents/Projects/ECSE4230F24/Python/Group13/Python_work/MC_ENCODER/mcencode.txt'  # Replace with actual file path
 with open(file_path, 'r') as file:
     lines = file.readlines()
+    #print(type(lines))
+    i = 1
+    #print(len(lines))
+    for j in range(len(lines)):
+        lines.insert(i,"out")
+        i += 2
+    lines.insert(0,"attention")
+    print(lines)
 
 # Ask user for dot length (restrict range between 0.001 and 2 seconds)
 def input_dot_time():
@@ -92,15 +106,21 @@ if dot_length > 0.05:
     for line in lines:
         word = line.strip()
         if word:
-            morse_code_sequence = text_to_morse(word)
+            morse_code_sequence = t2m(word)
             print(f"Morse Code for {word}: {' '.join(morse_code_sequence)}")
             play_morse_code(morse_code_sequence, dot_length)
+output_file_path = '/home/jdieffy/Documents/Projects/ECSE4230F24/Python/Group13/Python_work/MC_ENCODER/output.txt'
+with open(output_file_path, 'w') as output:
+    for line in lines:
+        word = line.strip().split()  # Strip any extra spaces or newline characters
+        #print(word)
+        for words in word:
+            #print(words)
+            mcode = encode(words)
+            #print(mcode)
+            output.write(f"{mcode} | {words}\n")
+            print(f"{mcode} | {words}")
 
-for line in lines:
-    word = line.strip()  # Strip any extra spaces or newline characters
-    if word:  # Only process if the line contains a word
-        morse_code = text_to_morse(word)
-        print(f"{morse_code}{word}")
 
 # Cleanup when done
 pi.stop()
