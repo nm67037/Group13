@@ -13,7 +13,7 @@ x = 0
 global state
 state = 0
 def changePWM():
-    pi.hardware_PWM(pin,frequency,duty*1000)
+    pi.hardware_PWM(pin,frequency,duty*10000)
 def hardwarestate():
     global state
     if state == 0:
@@ -57,8 +57,10 @@ try:
         elif duty < 0:
             duty = 0
         os.system('clear')
-        changePWM()
+        if state == 1:
+            changePWM()
 
 except KeyboardInterrupt:
+    pi.hardware_PWM(pin,0,0)
     pi.stop()
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, filedescriptors)

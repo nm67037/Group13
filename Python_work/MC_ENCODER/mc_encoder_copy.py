@@ -5,7 +5,7 @@ from time import sleep
 pi = pigpio.pi()  # Connect to pigpio daemon
 if not pi.connected:
     exit()
-pi.set_PWM_frequency(17,800)
+pi.set_PWM_frequency(18,800)
 # Setup the GPIO pin (adjust the pin number based on your circuit)
 #0.LED_PIN = 17  # Example GPIO pin connected to the speaker/microphone
 
@@ -108,7 +108,7 @@ def input_dot_time():
 
 
 dot_length = input_dot_time()
-if dot_length > 0.005:
+if dot_length > 0.05:
     play = True
 
 # Process each word and convert to Morse code
