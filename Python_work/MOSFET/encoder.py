@@ -30,4 +30,4 @@ while True:
           steps-=1
     lastClkState=clkState
     print(steps)
-    print("None")
+    #print("None")
