@@ -17,23 +17,34 @@ tone = 800
 # Setup
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(TELEGRAPH_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-#GPIO.setup(LED_PIN,GPIO.OUT,initial=GPIO.LOW)
-
+# def encode(input):
+#     char2code = {
+#     'a': '.-', 'b': '-...', 'c': '-.-.', 'd': '-..', 'e': '.', 'f': '..-.',
+#     'g': '--.', 'h': '....', 'i': '..', 'j': '.---', 'k': '-.-', 'l': '.-..',
+#     'm': '--', 'n': '-.', 'o': '---', 'p': '.--.', 'q': '--.-', 'r': '.-.',
+#     's': '...', 't': '-', 'u': '..-', 'v': '...-', 'w': '.--', 'x': '-..-',
+#     'y': '-.--', 'z': '--..',
+#     '0': '-----', '1': '.----', '2': '..---', '3': '...--', '4': '....-', 
+#     '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.',
+#     '#': '-.-.-', '*': '.-.-.'
+#     }
+#     encoded_letter = char2code.get(input,'?')
+#     print(encoded_letter)
+#     return encoded_letter
 def decode(current_word):
-    morse_code_dict = {
+    code2char = {
 
-    '.-': 'A', '-...': 'B', '-.-.': 'C', '-..': 'D', '.': 'E', '..-.': 'F',
-    '--.': 'G', '....': 'H', '..': 'I', '.---': 'J', '-.-': 'K', '.-..': 'L',
-    '--': 'M', '-.': 'N', '---': 'O', '.--.': 'P', '--.-': 'Q', '.-.': 'R',
-    '...': 'S', '-': 'T', '..-': 'U', '...-': 'V', '.--': 'W', '-..-': 'X',
-    '-.--': 'Y', '--..': 'Z', '-----': '0', '.----': '1', '..---': '2',
+    '.-': 'a', '-...': 'b', '-.-.': 'c', '-..': 'd', '.': 'e', '..-.': 'f',
+    '--.': 'g', '....': 'h', '..': 'i', '.---': 'j', '-.-': 'k', '.-..': 'l',
+    '--': 'm', '-.': 'n', '---': 'o', '.--.': 'p', '--.-': 'q', '.-.': 'r',
+    '...': 's', '-': 't', '..-': 'u', '...-': 'v', '.--': 'w', '-..-': 'x',
+    '-.--': 'y', '--..': 'z', '-----': '0', '.----': '1', '..---': '2',
     '...--': '3', '....-': '4', '.....': '5', '-....': '6', '--...': '7',
-    '---..': '8', '----.': '9', '-.-.-': 'ATTENTION', '.-.-.': 'OUT'
+    '---..': '8', '----.': '9', '-.-.-': 'attention', '.-.-.': 'out'
 
     }
 
-    string_morse_letter = ''.join(current_word)
-    decoded_letter = morse_code_dict.get(string_morse_letter, "?")
+    decoded_letter = code2char.get(current_word, "?")
     print(decoded_letter)
     return decoded_letter
 def read_telegraph_key(option):
@@ -55,7 +66,7 @@ def read_telegraph_key(option):
             etime = time.time()
             press_duration = etime - itime
             lift_duration = itime - stime + 0.05
-            print(f"pressed for: {press_duration}, lifted for: {lift_duration}")
+            #print(f"pressed for: {press_duration}, lifted for: {lift_duration}")
             time.sleep(0.05)
             if option:
                 return press_duration
@@ -63,7 +74,7 @@ def read_telegraph_key(option):
                 return [press_duration,lift_duration]
         timeout = time.time() - stime
         if timeout > (10 or dot_length*10) and initialized == 1:
-             print("timeout")
+             #print("timeout")
              return [99,99]
     
         time.sleep(0.05)  # Short delay to avoid rapid polling
@@ -71,7 +82,8 @@ def initialize():
     global dot_length
     global dot_dev
     global initialized
-    print("Please input Attention: - . - . -")
+    print("Please Enter:")
+    print("-.-.- | attention")
     d1 = read_telegraph_key(1)/3 	#dash
     [d2,d3] = read_telegraph_key(0) #dot
     [d4,d5] = read_telegraph_key(0) #dash
@@ -83,7 +95,7 @@ def initialize():
     initialized = 1
     print(dot_length)
     print(dot_dev)
-
+    GPIO.add_event_detect(TELEGRAPH_PIN, GPIO.FALLING, callback=pressloop, bouncetime=50)
 def record():
     word = ''
     current_word = '-.-.-'
@@ -92,39 +104,75 @@ def record():
         [value,lifttime] = read_telegraph_key(0)
         if value <= (3*dot_length-dot_dev*5):
             kar = '.'
-            print(".")
+            #print(".")
         elif (3*dot_length-dot_dev*5) < value < 99:
             kar = '-'
-            print("-")
+            #print("-")
         else:
             kar = ''
             
         if lifttime <= (3*dot_length-dot_dev*3):
             current_word = current_word + kar
             print(f"84 {current_word}")
-            print("ditgap")
+            #print("ditgap")
         elif (3*dot_length-dot_dev*3) < lifttime <= (7*dot_length-dot_dev*3):
             word= word + decode(current_word)
             current_word = ''
             current_word = current_word + kar
-            print("lettergap")
+            #print("lettergap")
         elif (7*dot_length-dot_dev*3) < lifttime < 99:
-            print("wordgap")
+            #print("wordgap")
             word = f'{word}{decode(current_word)} '
             current_word = ''
             current_word = current_word + kar
-            print(word)
+            #print(word)
         else:
             if current_word != '':
                 word = word + f'{decode(current_word)}'
             current_word = ''
-            print(word)
+            #print(word)
             #break
-            
+def liftloop():
+    global end
+    stime = time.time() #get the start time of this loop
+    end = 0
+    while GPIO.input(TELEGRAPH_PIN) == GPIO.HIGH:
+        etime = time.time() - stime
+        if etime < (3*dot_length - dot_dev*3):
+            print("dotdash gap")
+            pass #space between dots and dashes
+        elif (3*dot_length - dot_dev*3) < etime < (7*dot_length - dot_dev*3):
+            print("lettergap")
+            pass #space between letters
+        else:
+            print("wordgap")
+            end = 1 #sit in end loop after word logic and do nothing until key inturrupt
+            pass #space between words
+        while end:
+            #print("end loopin")
+            pass
 
+def pressloop(channel):
+    time.sleep(.05)
+    global end
+    end = 0
+    stime = time.time() #get the start time of this loop
+    while GPIO.input(TELEGRAPH_PIN) == GPIO.LOW:
+        etime = time.time() - stime
+        if etime < (3*dot_length - dot_dev*3):
+            print(" . ")
+            pass #the input is a dot
+        else:
+            print(" - ")
+            pass #the input is a dash
+        print("pressloopin")
+    print("leaving pressloop")
 try:
     initialize()
-    record()
+    while True: #main loop
+        #print("mainloopin")
+        liftloop()
+    #record()
     #read_telegraph_key()
 except KeyboardInterrupt:
     print("Program terminated")
