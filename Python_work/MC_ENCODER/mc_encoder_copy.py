@@ -2,14 +2,16 @@ import pigpio
 from time import sleep
 spkr = 18
 tone = 800
+
 # Initialize pigpio
 pi = pigpio.pi()  # Connect to pigpio daemon
 if not pi.connected:
     exit()
+pi.set_mode(12,pigpio.OUTPUT)
+pi.write(12,1)
 #pi.set_PWM_frequency(18,800)
 # Setup the GPIO pin (adjust the pin number based on your circuit)
 #0.LED_PIN = 17  # Example GPIO pin connected to the speaker/microphone
-
 
 # Morse code dictionary for English letters and numbers
 morse_code_dict = {
@@ -51,17 +53,21 @@ def encode(text):
 # Function to play a dot (high for x seconds)
 def play_dot(dot_length):
     print("play dot")
+    pi.write(12,0)
     pi.hardware_PWM(spkr,tone,50000)  # Set GPIO high
     sleep(dot_length)
-    pi.hardware_PWM(spkr,tone,0)  # Set GPIO low
+    pi.hardware_PWM(spkr,tone,0)
+    pi.write(12,1)# Set GPIO low
 #    sleep(dot_length)  # Space between dots/dashes in a letter
 
 # Function to play a dash (high for 3x seconds)
 def play_dash(dot_length):
     print("play dash")
+    pi.write(12,0)
     pi.hardware_PWM(spkr,tone,50000)  # Set GPIO high
     sleep(3 * dot_length)
-    pi.hardware_PWM(spkr,tone,0)  # Set GPIO low
+    pi.hardware_PWM(spkr,tone,0)
+    pi.write(12,1)# Set GPIO low
 #    sleep(dot_length)  # Space between dots/dashes in a letter
 
 # Function to play a Morse code sequence
@@ -164,5 +170,6 @@ except KeyboardInterrupt:
 
 # Cleanup when done
 #pi.set_PWM_dutycycle(17,0)
+pi.write(12,1)
 pi.hardware_PWM(spkr,0,0)
 pi.stop()
