@@ -54,13 +54,16 @@ def read_telegraph_key(option):
     while True:
         if GPIO.input(TELEGRAPH_PIN) == GPIO.LOW:  # Key is pressed
             #print(GPIO.input(TELEGRAPH_PIN))
-            #pi.hardware_PWM(spkr,tone,500000)
-            #pi.hardware_PWM(LED_PIN,tone,500000)
+            pi.hardware_PWM(spkr,tone,500000)
+            pi.hardware_PWM(LED_PIN,tone,500000)
             itime = time.time()
             time.sleep(0.05)#debounce
             # Wait until the key is released
             while GPIO.input(TELEGRAPH_PIN) == GPIO.LOW:
                 pass
+            pi.hardware_PWM(spkr,0,0)
+            pi.hardware_PWM(LED_PIN,0,0)
+            
             etime = time.time()
             press_duration = etime - itime
             lift_duration = itime - stime + 0.05
@@ -130,12 +133,12 @@ def telegraphkey(channel):
     stime = time.time() #get the start time of this loop
     if GPIO.input(TELEGRAPH_PIN):
         state = 1
-        #pi.hardware_PWM(spkr,0,0)
-        #pi.hardware_PWM(LED_PIN,0,0)
+        pi.hardware_PWM(spkr,0,0)
+        pi.hardware_PWM(LED_PIN,0,0)
     else:
         state = 0
-        #pi.hardware_PWM(spkr,tone,500000)
-        #pi.hardware_PWM(LED_PIN,tone,500000)
+        pi.hardware_PWM(spkr,tone,500000)
+        pi.hardware_PWM(LED_PIN,tone,500000)
     record()
 def displaylog(input):#display and log the input
     global code,message,line
@@ -158,14 +161,13 @@ def displaylog(input):#display and log the input
         outputfile.close()
 
 try:
-    mc_sheet = '/home/jdieffy/Documents/Projects/ECSE4230F24/Python/Group13/Python_work/MC_DECODER/mcdecodertest.txt'
+    mc_sheet = '/home/group13/Desktop/4230_Embedded_Group13/Group13/Python_work/MC_DECODER/mcdecodertest.txt'
     with open(mc_sheet, 'r') as file:
         lines = file.readlines()
     for i in range(len(lines)):
         lines[i] = lines[i].replace("\n","")
     
-    outputfile = open("/home/jdieffy/Documents/Projects/ECSE4230F24/Python/Group13/Python_work/MC_DECODER/output.txt","w")
-
+    outputfile = open("/home/group13/Desktop/4230_Embedded_Group13/Group13/Python_work/MC_DECODER/output.txt","w")
 
     initialize()
 
