@@ -104,9 +104,9 @@ try:
         #print(type(lines))
         i = 1
         #print(len(lines))
-        for j in range(len(lines)):
-            lines.insert(i,"*\n")
-            i += 2
+        # for j in range(len(lines)):
+        #     lines.insert(i,"*\n")
+        #     i += 2
         lines.insert(0,"#\n")
         print(lines)
 
