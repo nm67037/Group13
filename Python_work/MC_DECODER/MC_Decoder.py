@@ -20,7 +20,7 @@ spkr = 18
 tone = 800
 dotdash = ''
 odd = 'startup'
-code = ''
+code = '- . - . -'
 lettercode = ''
 wordcode = ''
 messagecode = ''
@@ -125,25 +125,25 @@ def initialize():
 def record():
     if state == 0:
         if etime < (2*dot_length - dot_dev*3):
-            space = 'dotdashgap'
+            space = ' '
             #print("1")
         elif (2*dot_length - dot_dev*3) < etime < (6*dot_length - dot_dev*3):
-            space = 'lettergap'
+            space = ','
             #print("2")
         else:
-            space = 'wordgap'
+            space = '_'
             #print(f"3 {space}")
         displaylog(space)
     elif state == 1:
         if etime < (2*dot_length - dot_dev*3):
             dotdash = '.'
-            displaylog(dotdash)
+            # displaylog(dotdash)
             #print(".")
             pass #the input is a dot
         else:
             #print("-")
             dotdash = '-'
-            displaylog(dotdash)
+        displaylog(dotdash)
     # word = ''
     # current_word = '-.-.-'
     # kar = ''
@@ -247,37 +247,45 @@ def telegraphkey(channel):
     record()
 def displaylog(input):#display and log the input
     global code,lettercode,wordcode,messagecode,word,message,line
+    code = code + input
+    words = code.split('_')
+    for i in range(len(words)):
+        words[i] = words[i].replace(' ','')
+        words[i] = words[i].replace(',',' ')
+        print(words[i])
+    #print(words)
+    # if state:
+    #     code = input
 
-    if state:
-        code = input
-
-    else:
-        if input == 'dotdashgap':
-            lettercode = lettercode + code #store last dot/dash
-            print("dotdash")
-            #print(word + decode(lettercode))
-        elif input == 'lettergap':
-            lettercode = lettercode + code
-            word = word + decode(lettercode) #store letter                
-            wordcode = wordcode + lettercode #store code for word
-            print("letter")
-            #print(word)
-            lettercode = ' ' #reset lettercode for next letter
-        elif input == 'wordgap':
-            lettercode = lettercode + code
-            word = word + decode(lettercode.replace(' ',''))
-            if word == lines[line].split("|")[1]:
-                line += 1
-            message = message + word #store word
-            wordcode = wordcode + lettercode
-            messagecode = messagecode + wordcode #final storage of code
-            lettercode = ''
-            word = ''
-            print("word")
-        code = ''
-    os.system('clear')
-    print(lines[line])
-    print(f"{wordcode}{lettercode}{code} | {word}{decode(lettercode.replace(' ',''))}")
+    # else:
+    #     if input == 'dotdashgap':
+    #         lettercode = lettercode + code #store last dot/dash
+    #         print("dotdash")
+    #         #print(word + decode(lettercode))
+    #     elif input == 'lettergap':
+    #         lettercode = lettercode + code
+    #         word = word + decode(lettercode) #store letter                
+    #         wordcode = wordcode + lettercode #store code for word
+    #         print("letter")
+    #         #print(word)
+    #         lettercode = '' #reset lettercode for next letter
+    #     elif input == 'wordgap':
+    #         lettercode = lettercode + code
+    #         word = (word + decode(lettercode))
+    #         print(word)
+    #         if word == lines[line].split("|")[1].replace(' ',''):
+    #             line += 1
+    #         message = message + word + '\n' #store word
+    #         wordcode = wordcode + lettercode
+    #         messagecode = messagecode + wordcode #final storage of code
+    #         lettercode = ''
+    #         word = ''
+    #         print("word")
+    #     # code = ''
+    # # os.system('clear')
+    # print(lines[line])
+    # print(f"{lettercode} | {word}")
+    # print(message)
             #print("word")
             #print(message)
 
