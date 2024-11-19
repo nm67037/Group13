@@ -11,11 +11,13 @@ global dot_dev
 global initialized
 initialized = 0
 dot_length = 99
+LED_PIN = 12
 spkr = 18
 tone = 800
 # Setup
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(TELEGRAPH_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+#GPIO.setup(LED_PIN,GPIO.OUT,initial=GPIO.LOW)
 
 def decode(current_word):
     morse_code_dict = {
@@ -38,8 +40,8 @@ def read_telegraph_key(option):
     stime = time.time()
     while True:
         if GPIO.input(TELEGRAPH_PIN) == GPIO.LOW:  # Key is pressed
-            pi.hardware_PWM(spkr,tone,50000)
-            pi.write(12,1)
+            pi.hardware_PWM(spkr,tone,500000)
+            pi.hardware_PWM(LED_PIN,tone,500000)
             itime = time.time()
             
             # Wait until the key is released
@@ -48,7 +50,8 @@ def read_telegraph_key(option):
             
             # Calculate press duration
             pi.hardware_PWM(spkr,0,0)
-            pi.write(12,0)
+            pi.hardware_PWM(LED_PIN,0,0)
+            #GPIO.output(LED_PIN,GPIO.LOW)
             etime = time.time()
             press_duration = etime - itime
             lift_duration = itime - stime + 0.05
@@ -96,16 +99,16 @@ def record():
         else:
             kar = ''
             
-        if lifttime <= (3*dot_length-dot_dev*5):
+        if lifttime <= (3*dot_length-dot_dev*3):
             current_word = current_word + kar
             print(f"84 {current_word}")
             print("ditgap")
-        elif (3*dot_length-dot_dev*5) < lifttime <= (7*dot_length-dot_dev*5):
+        elif (3*dot_length-dot_dev*3) < lifttime <= (7*dot_length-dot_dev*3):
             word= word + decode(current_word)
             current_word = ''
             current_word = current_word + kar
             print("lettergap")
-        elif (7*dot_length-dot_dev*5) < lifttime < 99:
+        elif (7*dot_length-dot_dev*3) < lifttime < 99:
             print("wordgap")
             word = f'{word}{decode(current_word)} '
             current_word = ''
@@ -125,8 +128,13 @@ try:
     #read_telegraph_key()
 except KeyboardInterrupt:
     print("Program terminated")
-    pi.hardware_PWM(18,0,0)
-finally:
+    pi.hardware_PWM(spkr,0,0)
+    pi.hardware_PWM(LED_PIN,0,0)
+    pi.stop()
     GPIO.cleanup()
-    print("Program terminated")
-    pi.hardware_PWM(18,0,0)
+# finally:
+#     #GPIO.cleanup()
+#     print("Program terminated")
+#     pi.hardware_PWM(spkr,tone,0)
+#     pi.stop()
+#     GPIO.cleanup()

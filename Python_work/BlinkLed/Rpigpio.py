@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 from time import sleep
 GPIO.setwarnings(0)
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(12,GPIO.OUT,initial=GPIO.HIGH)
+GPIO.setup(4,GPIO.OUT,initial=GPIO.HIGH)
 sleep(10)
 GPIO.cleanup()
 

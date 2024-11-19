@@ -98,15 +98,15 @@ def input_dot_time():
             print("Invalid input. Please enter a numeric value.")
 # Read words from the text file (multiple lines) 
 try:
-    file_path = '/home/group13/Desktop/4230_Embedded_Group13/Group13/Python_work/MC_ENCODER/mcencode.txt'  # Replace with actual file path
+    file_path = '/home/jdieffy/Documents/Projects/ECSE4230F24/Python/Group13/Python_work/MC_ENCODER/mcencode.txt'  # Replace with actual file path
     with open(file_path, 'r') as file:
         lines = file.readlines()
         #print(type(lines))
         i = 1
         #print(len(lines))
-        for j in range(len(lines)):
-            lines.insert(i,"*\n")
-            i += 2
+        # for j in range(len(lines)):
+        #     lines.insert(i,"*\n")
+        #     i += 2
         lines.insert(0,"#\n")
         print(lines)
 
@@ -139,7 +139,7 @@ try:
     #                 print(f"Morse Code for {word}: {' '.join(morse_code_sequence)}")
     #                 play_morse_code(morse_code_sequence, dot_length)
 
-    output_file_path = '/home/group13/Desktop/4230_Embedded_Group13/Group13/Python_work/MC_ENCODER/output.txt'
+    output_file_path = '/home/jdieffy/Documents/Projects/ECSE4230F24/Python/Group13/Python_work/MC_ENCODER/output.txt'
     with open(output_file_path, 'w') as output:
         for line in lines:
             word = line.strip().split()  # Strip any extra spaces or newline characters
