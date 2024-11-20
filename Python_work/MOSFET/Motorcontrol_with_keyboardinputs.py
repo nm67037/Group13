@@ -35,17 +35,17 @@ try:
         print("A: -100 hz| S: -10 hz| D: -10% DC") 
         x=sys.stdin.read(1)[0]
         if x == "q":
-            frequency += 100
-        elif x == "w":
             frequency += 10
+        elif x == "w":
+            frequency += 1
         elif x == "e":
-            duty += 10
+            duty += 1
         elif x == "a":
-            frequency -= 100
-        elif x == "s":
             frequency -= 10
+        elif x == "s":
+            frequency -= 1
         elif x == "d":
-            duty -= 10
+            duty -= 1
         elif x == "f":
             hardwarestate()
         if frequency > 20000:
