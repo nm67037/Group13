@@ -8,6 +8,7 @@ import numpy as np
 pi =pigpio.pi()
 global duty, et, stopchanging,deeteetime,clocktime
 et = np.zeros(75)
+meas = np.zeros(50)
 MOTOR_PIN = 19
 REV_PIN = 26
 CLOCK_PIN = 22
@@ -113,11 +114,14 @@ try:
 #             frq = 80//etime
 #             print(f"L:{frq*20} , {frq}")
 #             setduty()
-        time.sleep(.5)
-        frq = pcnt//.5
+        meas = np.roll(meas, 1)
+        time.sleep(.09)
+        frq = pcnt/.09
+        meas[0] = frq
+        ptfrq = math.floor(np.mean(meas))
         os.system('clear')
         print(f"Set RPM: {SFRQ*20}")
-        print(f"RPM:{frq*20} , {frq} hz")
+        print(f"RPM:{ptfrq*20} , {ptfrq} hz")
         pcnt = 0
         if state:
             setduty()
