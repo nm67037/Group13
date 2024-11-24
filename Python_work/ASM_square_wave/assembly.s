@@ -17,7 +17,7 @@ _start:
     str r1, [r0, #GPFSEL2]
     @make FSEL2 8, making GPIO21 an OUTPUT
 
-    ldr r2, =0x800000 @initial counter for delay subroutines
+    ldr r2, =0x800000 @initial counter for delay subroutines. This will determine how long delay is.
 
 loop: @turn on LED
 
@@ -25,11 +25,11 @@ loop: @turn on LED
     str r1, [r0, #SET0] @turn ON
 
     @controllable? delay
-    eor r10, r10, r10 @idk what this does
+    mov r10, #0 @clear r10
     delay1
         add r10, r10, #1 @increment by 1
-        cmp r10, r2 #set the flags after comparing r10 to r2, initial counter for delay subroutine.
-        bne, delay1 @branch to keep delaying
+        cmp r10, r2 
+        bne, delay1 @branch to keep delaying. Fall through if increment counter r10 reaches initial counter in r2.
 
     @above program turns ON the LED and waits for some time
 
@@ -37,14 +37,18 @@ loop: @turn on LED
     str r1, [r0, #CLR0] @turn OFF
 
     @controllable? delay
-    eor r10, r10, r10 @idk what this does
+    mov r10, #0 @clear r10
     delay2
         add r10, r10, #1 @increment by 1
-        cmp r10, r2 #set the flags after comparing r10 to r2, initial counter for delay subroutine.
-        bne, delay2 @branch to keep delaying
+        cmp r10, r2 
+        bne, delay2 @branch to keep delaying. Fall through if r10 reaches r2.
 
     @above program turns OFF the LED. Same logic as turn ON. Just using CLR register instead.
 
     b loop @run PWM/square wave code indefinitely
+
+    @delay comments: Each delay takes 2 clock cycles (ignoring branches due to good branch prediction)
+    @Thus, if you want the delay between PWM ON and OFF to be 1 second, and 1 clock cycle is 0.67 ns, 
+    @then set r2 to be the hex conversion of 1.5 billion (decimal)
 
 
