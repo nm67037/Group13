@@ -5,7 +5,9 @@
 .equ GPIO_21_OUT, 0x08 @This is what FSEL2 needs to be set to to make GPIO21 an OUT.
 
 .equ SET0, 0x1C @offset from base to appropriate set register
-.equ CLR0, 0x28 @offset from base to appropriate clear register 
+.equ CLR0, 0x28 @offset from base to appropriate clear register
+
+.equ delay, 0x59682F00 @this sets the delay to 1 second
 
 .equ GPIO21_value, 0x200000 @In 24 bits, 1 logical shifted left 21 spaces.
 
@@ -17,7 +19,7 @@ _start:
     str r1, [r0, #GPFSEL2]
     @make FSEL2 8, making GPIO21 an OUTPUT
 
-    ldr r2, =0x800000 @initial counter for delay subroutines. This will determine how long delay is.
+    ldr r2,=delay
 
 loop: @turn on LED
 
