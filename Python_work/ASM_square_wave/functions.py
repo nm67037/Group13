@@ -4,8 +4,8 @@ import os
 from time import sleep
 
 class square_wave:
-    def __init__(self,frequency):
-        self.frequency=frequency
+    def __init__(self,delay):
+        self.frequency=delay
         with open('/home/vizhins/Embedded_1/Group13/Python_work/ASM_square_wave/assembly.s') as file:
             lines=[line.rstrip() for line in file.readlines()] #open and read the .s file
             for line in lines:
@@ -17,18 +17,20 @@ class square_wave:
                 file.writelines(line)
                 file.write('\n')
 
-    def setFrequency(self): 
+    def find_new_delay(self,desiredFrequency): 
         delay = 1/ (2 * desiredFrequency) #transfer function to turn input desired frequency into output delay value in ASM file
         return delay
 
     def start(self):
-        os.chdir #how to use this to navigate to ASM_square_wave directory?
+        os.chdir("/home/vizhins/Embedded_1/Group13/Python_work/ASM_square_wave") #how to use this to navigate to ASM_square_wave directory?
         process=subprocess.Popen('make',shell=False,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
         process.wait()
 
+        self.p1=subprocess.Popen('./assembly.s',shell=False,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+
     def stop(self):
         self.p1.terminate()
-        #call the assembly file if_GPIO_high?
+        #call the external assembly file that switches GPIO to low if it stays high even after .terminate()
 
   # def setFrequency(self,frequency):
       #do something here  
