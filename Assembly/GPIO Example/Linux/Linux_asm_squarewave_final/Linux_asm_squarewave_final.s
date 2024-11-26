@@ -26,14 +26,13 @@
 .equ    MAP_SHARED,1    @ share changes with other processes
 .equ    PROT_RDWR,0x3   @ PROT_READ(0x1)|PROT_WRITE(0x2)
 
-.equ    duty,50
-.equ    frq,1000
+.equ    duty,50         @ Square Wave dutycycle gets defined here
+.equ    frq,1000        @ Square Wave frequency gets defined here
+
 @ Constant program data
     .section .rodata
 device:
     .asciz  "/dev/gpiomem"
-	.data
-    data_store: .space 8
 
 @ The program
     .text
@@ -63,58 +62,61 @@ main:
     bic     r2, r2, #GPFSEL2_GPIO21_MASK@ clear pin field
     orr     r2, r2, #MAKE_GPIO21_OUTPUT @ enter function code
     str     r2, [r0]                    @ update register
-frqnduty:    ldr r7, =frq
-    lsl r7,#1
-    ldr r8,=#1800475088
-    udiv r7, r8, r7
-    mov r9, r7
-    mov r8, #100
-    udiv r7, r7, r8
-    mov r8, #duty
-    mul r7, r8, r7
-    sub r8, r9, r7
 
-mainloop:    bl on
-    bl off
-    b mainloop
+@ Calculate the number of loops necessary to pulse at the frequency and duty cycle defined above
+frqnduty:
+    ldr r7, =frq        @ r7 = frequency defined at the top of the file
+    lsl r7,#1           @ r7 * 2
+    ldr r8,=#1800475088 @ r8 = Raspberry Pi Clock Speed
+    udiv r7, r8, r7     @ r7 = Pi Clock Speed / (defined frequency * 2)
+    mov r9, r7          @ r9 = total clocks for 1 period at defined frequency
+    mov r8, #100        @ r8 = 100
+    udiv r7, r7, r8     @ r7 = one hundrendth of the required loops
+    mov r8, #duty       @ r8 = %dutycycle
+    mul r7, r8, r7      @ r7 = number of loops * (%dutycycle/100)
+    sub r8, r9, r7      @ r8 = total number of loops - number of loops spent on
+
+@ main loop of the program
+mainloop:    
+    bl on       @ Turn on the GPio then return here after its delay
+    bl off      @ Turn off the GPio then return here after its delay
+    b mainloop  @ Repeat
 
 @Delay Time on
 delay_on:
+    mov	r6, r7	@ r6 = number of loops to achieve the right on time required by frequency and duty 
 
-    mov	r6, r7	@ r1 = 1,000,000,000 (inner loop count) 
-onl:	subs	r6, r6, #1		@ r1 = r1 – 1, decrement r1 (inner loop) 
-	bne	onl			@ repeat it until r1 = 0 
+onl:	subs	r6, r6, #1		@ Decrement loop count down 
+	bne	onl			            @ repeat on loop until r6 = 0 
+    bx lr       @ Return to caller at mainloop
 
-    bx lr
 @Delay time off
 delay_off:
-    mov	r6, r8	@ r1 = 1,000,000,000 (inner loop count) 
-offl:	subs	r6, r6, #1		@ r1 = r1 – 1, decrement r1 (inner loop) 
-    bne	offl			@ repeat it until r1 = 0 
+    mov	r6, r8	@ r6 = number of loops to achieve the right off time required by frequency and duty 
 
-    bx lr
+offl:	subs	r6, r6, #1		@ Decrement loop count down
+    bne	offl			        @ repeat off loop until r6 = 0 
+    bx lr       @ Return to caller at mainloop
 
 on:
 @ Turn on
     add     r0, r5, #GPSET0 @ calc GPSET0 address
-
     mov     r3, #1          @ turn on bit
     lsl     r3, r3, #PIN    @ shift bit to pin position
     orr     r2, r2, r3      @ set bit
     str     r2, [r0]        @ update register
 
-    b delay_on
+    b delay_on              @ branch to on delay loop
 
 off:
 @ Turn off
     add     r0, r5, #GPCLR0 @ calc GPCLR0 address
-
     mov     r3, #1          @ turn off bit
     lsl     r3, r3, #PIN    @ shift bit to pin position
     orr     r2, r2, r3      @ set bit
     str     r2, [r0]        @ update register
 
-    b delay_off
+    b delay_off             @ branch to off delay loop
 
 GPIO_BASE:
     .word   0xfe200000  @GPIO Base address Raspberry pi 4
