@@ -1,17 +1,17 @@
 @ mmap part taken from by https://bob.cs.sonoma.edu/IntroCompOrg-RPi/sec-gpio-mem.html
 
-@ Constants for blink at GPIO21
-@ GPFSEL2 [Offset: 0x08] responsible for GPIO Pins 20 to 29
+@ Constants for blink at GPIO11
+@ GPFSEL1 [Offset: 0x04] responsible for GPIO Pins 20 to 29
 @ GPCLR0 [Offset: 0x28] responsible for GPIO Pins 0 to 31
 @ GPSET0 [Offest: 0x1C] responsible for GPIO Pins 0 to 31
 
 @ GPOI21 Related
-.equ    GPFSEL2, 0x08   @ function register offset
+.equ    GPFSEL1, 0x04   @ function register offset
 .equ    GPCLR0, 0x28    @ clear register offset
 .equ    GPSET0, 0x1c    @ set register offset
-.equ    GPFSEL2_GPIO21_MASK, 0b111000   @ Mask for fn register
-.equ    MAKE_GPIO21_OUTPUT, 0b1000      @ use pin for ouput
-.equ    PIN, 21                         @ Used to set PIN high / low
+.equ    GPFSEL1_GPIO11_MASK, 0b111000   @ Mask for fn register
+.equ    MAKE_GPIO11_OUTPUT, 0b1000      @ use pin for ouput
+.equ    PIN, 11                         @ Used to set PIN high / low
 
 @ Args for mmap
 .equ    OFFSET_FILE_DESCRP, 0   @ file descriptor
@@ -57,10 +57,10 @@ main:
     mov     r5, r0           @ save the virtual memory address in r5
 
 @ Set up the GPIO pin funtion register in programming memory
-    add     r0, r5, #GPFSEL2            @ calculate address for GPFSEL2
-    ldr     r2, [r0]                    @ get entire GPFSEL2 register
-    bic     r2, r2, #GPFSEL2_GPIO21_MASK@ clear pin field
-    orr     r2, r2, #MAKE_GPIO21_OUTPUT @ enter function code
+    add     r0, r5, #GPFSEL1            @ calculate address for GPFSEL1
+    ldr     r2, [r0]                    @ get entire GPFSEL1 register
+    bic     r2, r2, #GPFSEL1_GPIO11_MASK@ clear pin field
+    orr     r2, r2, #MAKE_GPIO11_OUTPUT @ enter function code
     str     r2, [r0]                    @ update register
 
 @ Calculate the number of loops necessary to pulse at the frequency and duty cycle defined above
